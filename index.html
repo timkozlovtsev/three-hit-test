@@ -1,181 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>three.js ar - hit test</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<meta property="og:title" content="three.js ar - hit test">
-		<meta property="og:type" content="website">
-		<meta property="og:url" content="https://threejs.org/examples/webxr_ar_hittest.html">
-		<meta property="og:image" content="https://threejs.org/examples/screenshots/webxr_ar_hittest.jpg">
-		<link type="text/css" rel="stylesheet" href="main.css">
-	</head>
-	<body>
 
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - hit test<br/>
-		</div>
+<head>
+    <title>three.js ar - hit test</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta property="og:title" content="three.js ar - hit test">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://threejs.org/examples/webxr_ar_hittest.html">
+    <meta property="og:image" content="https://threejs.org/examples/screenshots/webxr_ar_hittest.jpg">
+</head>
 
-		<script type="importmap">
-			{
-				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/"
-				}
-			}
-		</script>
+<body>
 
-		<script type="module">
+    <div id="info">
+        <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - hit test<br />
+    </div>
 
-			import * as THREE from 'three';
-			import { ARButton } from 'three/addons/webxr/ARButton.js';
 
-			let container;
-			let camera, scene, renderer;
-			let controller1, controller2;
+    <script type="module">
+        import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+        import { ARButton } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/ARButton.js';
 
-			let reticle;
+        let container;
+        let camera, scene, renderer;
+        let controller1, controller2;
 
-			let hitTestSource = null;
-			let hitTestSourceRequested = false;
+        let reticle;
 
-			init();
+        let hitTestSource = null;
+        let hitTestSourceRequested = false;
 
-			function init() {
+        init();
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+        function init() {
 
-				scene = new THREE.Scene();
+            container = document.createElement('div');
+            document.body.appendChild(container);
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
+            scene = new THREE.Scene();
 
-				const light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 3 );
-				light.position.set( 0.5, 1, 0.25 );
-				scene.add( light );
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
 
-				//
+            const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 3);
+            light.position.set(0.5, 1, 0.25);
+            scene.add(light);
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
-				renderer.xr.enabled = true;
-				container.appendChild( renderer.domElement );
+            //
 
-				//
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setAnimationLoop(animate);
+            renderer.xr.enabled = true;
+            container.appendChild(renderer.domElement);
 
-				document.body.appendChild( ARButton.createButton( renderer, { requiredFeatures: [ 'hit-test' ] } ) );
+            //
 
-				//
+            document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures: ['hit-test'] }));
 
-				const geometry = new THREE.BoxGeometry( 0.1, 0.1, 0.1).translate( 0, 0.1, 0 );
+            //
 
-				function onSelect() {
+            const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1).translate(0, 0.1, 0);
 
-					if ( reticle.visible ) {
+            function onSelect() {
 
-						const material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random() } );
-						const mesh = new THREE.Mesh( geometry, material );
-						reticle.matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
-						const scale = Math.random() * 2 + 1
-                        mesh.scale.x =scale;
-						mesh.scale.y = scale;
-						mesh.scale.z = scale;
-						scene.add( mesh );
+                if (reticle.visible) {
 
-					}
+                    const material = new THREE.MeshPhongMaterial({ color: 0xffffff * Math.random() });
+                    const mesh = new THREE.Mesh(geometry, material);
+                    reticle.matrix.decompose(mesh.position, mesh.quaternion, mesh.scale);
+                    const scale = Math.random() * 2 + 1
+                    mesh.scale.x = scale;
+                    mesh.scale.y = scale;
+                    mesh.scale.z = scale;
+                    scene.add(mesh);
 
-				}
+                }
 
-				controller1 = renderer.xr.getController( 0 );
-				controller1.addEventListener( 'select', onSelect );
-				scene.add( controller1 );
+            }
 
-				controller2 = renderer.xr.getController( 1 );
-				controller2.addEventListener( 'select', onSelect );
-				scene.add( controller2 );
+            controller1 = renderer.xr.getController(0);
+            controller1.addEventListener('select', onSelect);
+            scene.add(controller1);
 
-				reticle = new THREE.Mesh(
-					new THREE.RingGeometry( 0.15, 0.2, 32 ).rotateX( - Math.PI / 2 ),
-					new THREE.MeshBasicMaterial()
-				);
-				reticle.matrixAutoUpdate = false;
-				reticle.visible = false;
-				scene.add( reticle );
+            controller2 = renderer.xr.getController(1);
+            controller2.addEventListener('select', onSelect);
+            scene.add(controller2);
 
-				//
+            reticle = new THREE.Mesh(
+                new THREE.RingGeometry(0.15, 0.2, 32).rotateX(- Math.PI / 2),
+                new THREE.MeshBasicMaterial()
+            );
+            reticle.matrixAutoUpdate = false;
+            reticle.visible = false;
+            scene.add(reticle);
 
-				window.addEventListener( 'resize', onWindowResize );
+            //
 
-			}
+            window.addEventListener('resize', onWindowResize);
 
-			function onWindowResize() {
+        }
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+        function onWindowResize() {
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
 
-			}
+            renderer.setSize(window.innerWidth, window.innerHeight);
 
-			//
+        }
 
-			function animate( timestamp, frame ) {
+        //
 
-				if ( frame ) {
+        function animate(timestamp, frame) {
 
-					const referenceSpace = renderer.xr.getReferenceSpace();
-					const session = renderer.xr.getSession();
+            if (frame) {
 
-					if ( hitTestSourceRequested === false ) {
+                const referenceSpace = renderer.xr.getReferenceSpace();
+                const session = renderer.xr.getSession();
 
-						session.requestReferenceSpace( 'viewer' ).then( function ( referenceSpace ) {
+                if (hitTestSourceRequested === false) {
 
-							session.requestHitTestSource( { space: referenceSpace } ).then( function ( source ) {
+                    session.requestReferenceSpace('viewer').then(function (referenceSpace) {
 
-								hitTestSource = source;
+                        session.requestHitTestSource({ space: referenceSpace }).then(function (source) {
 
-							} );
+                            hitTestSource = source;
 
-						} );
+                        });
 
-						session.addEventListener( 'end', function () {
+                    });
 
-							hitTestSourceRequested = false;
-							hitTestSource = null;
+                    session.addEventListener('end', function () {
 
-						} );
+                        hitTestSourceRequested = false;
+                        hitTestSource = null;
 
-						hitTestSourceRequested = true;
+                    });
 
-					}
+                    hitTestSourceRequested = true;
 
-					if ( hitTestSource ) {
+                }
 
-						const hitTestResults = frame.getHitTestResults( hitTestSource );
+                if (hitTestSource) {
 
-						if ( hitTestResults.length ) {
+                    const hitTestResults = frame.getHitTestResults(hitTestSource);
 
-							const hit = hitTestResults[ 0 ];
+                    if (hitTestResults.length) {
 
-							reticle.visible = true;
-							reticle.matrix.fromArray( hit.getPose( referenceSpace ).transform.matrix );
+                        const hit = hitTestResults[0];
 
-						} else {
+                        reticle.visible = true;
+                        reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
 
-							reticle.visible = false;
+                    } else {
 
-						}
+                        reticle.visible = false;
 
-					}
+                    }
 
-				}
+                }
 
-				renderer.render( scene, camera );
+            }
 
-			}
+            renderer.render(scene, camera);
 
-		</script>
-	</body>
+        }
+
+    </script>
+</body>
+
 </html>
