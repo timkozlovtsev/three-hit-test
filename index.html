@@ -59,9 +59,7 @@
 
             document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures: ['hit-test'] }));
 
-            //
-
-            const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1).translate(0, 0.1, 0);
+            const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1).translate(0, 0.01, 0);
 
             function onSelect() {
 
@@ -89,7 +87,7 @@
             scene.add(controller2);
 
             reticle = new THREE.Mesh(
-                new THREE.RingGeometry(0.15, 0.2, 32).rotateX(- Math.PI / 2),
+                new THREE.RingGeometry(0.15, 0.2, 32, 4).rotateX(- Math.PI / 2),
                 new THREE.MeshBasicMaterial()
             );
             reticle.matrixAutoUpdate = false;
